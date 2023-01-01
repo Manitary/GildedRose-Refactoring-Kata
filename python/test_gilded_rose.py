@@ -2,7 +2,7 @@
 from typing import Iterator
 import pytest
 from _pytest.mark.structures import ParameterSet
-from gilded_rose import Item, GildedRose
+from gilded_rose import Item, GildedRose, ItemQualityError, SulfurasQualityError
 
 
 def items_are_same(item1: Item, item2: Item) -> bool:
@@ -90,3 +90,43 @@ def test_single_item(item) -> None:
     updated_item = shop.items[0]
     expected_item = item[1]
     assert items_are_same(updated_item, expected_item)
+
+
+def invalid_items() -> Iterator[ParameterSet]:
+    """Yield invalid items to test.
+
+    Yield a tuple containing:
+        - An Item object.
+        - The expected error to be raised."""
+    variants = {
+        "Generic item - over maximum": (
+            Item("+5 Dexterity Vest", 10, 51),
+            ItemQualityError,
+        ),
+        "Generic item - under minimum": (
+            Item("+5 Dexterity Vest", -5, -1),
+            ItemQualityError,
+        ),
+        "Sulfuras - wrong value 1": (
+            Item("Sulfuras, Hand of Ragnaros", 0, 51),
+            SulfurasQualityError,
+        ),
+        "Sulfuras - wrong value 2": (
+            Item("Sulfuras, Hand of Ragnaros", 0, -1),
+            SulfurasQualityError,
+        ),
+        "Sulfuras - wrong value 3": (
+            Item("Sulfuras, Hand of Ragnaros", 0, 10),
+            SulfurasQualityError,
+        ),
+    }
+    for key, value in variants.items():
+        yield pytest.param(value, id=key)
+
+
+@pytest.mark.parametrize("item", invalid_items())
+def test_invalid_item(item) -> None:
+    """Test a single item after 1 day has passed."""
+    expected_exception = item[1]
+    with pytest.raises(expected_exception):
+        GildedRose(items=[item[0]])
