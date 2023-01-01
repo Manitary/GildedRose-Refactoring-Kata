@@ -29,9 +29,10 @@ def is_valid_item(item: Item) -> bool:
     Requirements:
         - "Sulfuras, Hand of Ragnaros" must have quality 80.
         - For any other item, 0 <= quality <= 50."""
-    if item.name == "Sulfuras, Hand of Ragnaros" and item.quality != 80:
-        raise SulfurasQualityError
-    if item.quality < 0 or item.quality > 50:
+    if item.name == "Sulfuras, Hand of Ragnaros":
+        if item.quality != 80:
+            raise SulfurasQualityError
+    elif item.quality < 0 or item.quality > 50:
         raise ItemQualityError
     return True
 
