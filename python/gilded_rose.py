@@ -8,7 +8,7 @@ from enum import IntEnum, StrEnum
 
 
 class Quality(IntEnum):
-    """Special item qualities."""
+    """Special item quality values."""
 
     MIN = 0
     MAX = 50
@@ -16,7 +16,7 @@ class Quality(IntEnum):
 
 
 class SpecialItem(StrEnum):
-    """Items with special properties identified by their unique name."""
+    """Item names that are bound to special properties."""
 
     SULFURAS = "Sulfuras, Hand of Ragnaros"
     BRIE = "Aged Brie"
@@ -34,6 +34,10 @@ class Item:
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
 
 
+class SulfurasExpirationError(ValueError):
+    """Sulfuras, Hand of Ragnaros never has to be sold."""
+
+
 class SulfurasQualityError(ValueError):
     """Sulfuras, Hand of Ragnaros always has quality 80."""
 
@@ -46,18 +50,21 @@ def is_valid_item(item: Item) -> bool:
     """Return whether the item is valid.
 
     Requirements:
+        - "Sulfuras, Hand of Ragnaros" never has to be sold.
         - "Sulfuras, Hand of Ragnaros" must have quality 80.
         - For any other item, 0 <= quality <= 50."""
     if item.name == SpecialItem.SULFURAS:
         if item.quality != Quality.SULFURAS:
             raise SulfurasQualityError
+        if item.sell_in > 0:
+            raise SulfurasExpirationError
     elif item.quality < Quality.MIN or item.quality > Quality.MAX:
         raise ItemQualityError
     return True
 
 
 class GildedRose:
-    """Class that handles the Gilded Rose inventory."""
+    """Handle the Gilded Rose inventory."""
 
     def __init__(self, items) -> None:
         for item in items:
@@ -71,7 +78,7 @@ class GildedRose:
 
     @staticmethod
     def update_item(item: Item) -> None:
-        """Update an item."""
+        """Update an item after a day has passed."""
         if item.name == SpecialItem.SULFURAS:
             return
         if item.name == SpecialItem.BRIE:
@@ -101,4 +108,3 @@ class GildedRose:
                 )
 
         item.sell_in -= 1
-        return

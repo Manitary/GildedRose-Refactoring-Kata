@@ -7,6 +7,7 @@ from gilded_rose import (
     GildedRose,
     ItemQualityError,
     SulfurasQualityError,
+    SulfurasExpirationError,
     SpecialItem,
     Quality,
 )
@@ -140,6 +141,10 @@ def invalid_items() -> Iterator[ParameterSet]:
         "Sulfuras - wrong value 3": (
             Item(SpecialItem.SULFURAS, 0, 10),
             SulfurasQualityError,
+        ),
+        "Sulfuras - wrong expiration": (
+            Item(SpecialItem.SULFURAS, 1, 80),
+            SulfurasExpirationError,
         ),
     }
     for key, value in variants.items():
