@@ -21,6 +21,7 @@ class SpecialItem(StrEnum):
     SULFURAS = "Sulfuras, Hand of Ragnaros"
     BRIE = "Aged Brie"
     BACKSTAGE_PASS = "Backstage passes to a TAFKAL80ETC concert"
+    CONJURED = "Conjured"
 
 
 class Item:
@@ -88,6 +89,11 @@ class GildedRose:
                 else:
                     item.quality += 1
                 item.quality = min(item.quality, Quality.MAX)
+        elif item.name.startswith(SpecialItem.CONJURED):
+            if item.quality > Quality.MIN:
+                item.quality = max(
+                    item.quality - (2 if item.sell_in > 0 else 4), Quality.MIN
+                )
         else:
             if item.quality > Quality.MIN:
                 item.quality = max(

@@ -87,6 +87,18 @@ def item_variants() -> Iterator[ParameterSet]:
             Item(SpecialItem.BACKSTAGE_PASS, 5, 48),
             Item(SpecialItem.BACKSTAGE_PASS, 4, Quality.MAX),
         ),
+        "Conjured item - new": (
+            Item("Conjured Mana Cake", 3, 20),
+            Item("Conjured Mana Cake", 2, 18),
+        ),
+        "Conjured item - expiration": (
+            Item("Conjured Mana Cake", 0, 14),
+            Item("Conjured Mana Cake", -1, 10),
+        ),
+        "Conjured item - min value": (
+            Item("Conjured Mana Cake", -3, 2),
+            Item("Conjured Mana Cake", -4, Quality.MIN),
+        ),
     }
     for key, value in variants.items():
         yield pytest.param(value, id=key)
