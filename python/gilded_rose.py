@@ -4,6 +4,24 @@ Specifications at GildedRoseRequirements.txt
 
 Important: do not alter the Item class!"""
 
+from enum import IntEnum, StrEnum
+
+
+class Quality(IntEnum):
+    """Special item qualities."""
+
+    MIN = 0
+    MAX = 50
+    SULFURAS = 80
+
+
+class SpecialItem(StrEnum):
+    """Items with special properties identified by their unique name."""
+
+    SULFURAS = "Sulfuras, Hand of Ragnaros"
+    BRIE = "Aged Brie"
+    BACKSTAGE_PASS = "Backstage passes to a TAFKAL80ETC concert"
+
 
 class Item:
     def __init__(self, name, sell_in, quality):
@@ -29,10 +47,10 @@ def is_valid_item(item: Item) -> bool:
     Requirements:
         - "Sulfuras, Hand of Ragnaros" must have quality 80.
         - For any other item, 0 <= quality <= 50."""
-    if item.name == "Sulfuras, Hand of Ragnaros":
-        if item.quality != 80:
+    if item.name == SpecialItem.SULFURAS:
+        if item.quality != Quality.SULFURAS:
             raise SulfurasQualityError
-    elif item.quality < 0 or item.quality > 50:
+    elif item.quality < Quality.MIN or item.quality > Quality.MAX:
         raise ItemQualityError
     return True
 

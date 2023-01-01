@@ -2,7 +2,14 @@
 from typing import Iterator
 import pytest
 from _pytest.mark.structures import ParameterSet
-from gilded_rose import Item, GildedRose, ItemQualityError, SulfurasQualityError
+from gilded_rose import (
+    Item,
+    GildedRose,
+    ItemQualityError,
+    SulfurasQualityError,
+    SpecialItem,
+    Quality,
+)
 
 
 def items_are_same(item1: Item, item2: Item) -> bool:
@@ -32,50 +39,53 @@ def item_variants() -> Iterator[ParameterSet]:
             Item("+5 Dexterity Vest", -1, 8),
         ),
         "Generic item - min value": (
-            Item("+5 Dexterity Vest", -5, 0),
-            Item("+5 Dexterity Vest", -6, 0),
+            Item("+5 Dexterity Vest", -5, Quality.MIN),
+            Item("+5 Dexterity Vest", -6, Quality.MIN),
         ),
-        "Aged brie - new": (Item("Aged Brie", 2, 0), Item("Aged Brie", 1, 1)),
-        "Aged brie - expiration": (Item("Aged Brie", 0, 2), Item("Aged Brie", -1, 4)),
+        "Aged brie - new": (Item(SpecialItem.BRIE, 2, 0), Item(SpecialItem.BRIE, 1, 1)),
+        "Aged brie - expiration": (
+            Item(SpecialItem.BRIE, 0, 2),
+            Item(SpecialItem.BRIE, -1, 4),
+        ),
         "Aged brie - max value": (
-            Item("Aged Brie", -24, 50),
-            Item("Aged Brie", -25, 50),
+            Item(SpecialItem.BRIE, -24, Quality.MAX),
+            Item(SpecialItem.BRIE, -25, Quality.MAX),
         ),
         "Sulfuras 1": (
-            Item("Sulfuras, Hand of Ragnaros", 0, 80),
-            Item("Sulfuras, Hand of Ragnaros", 0, 80),
+            Item(SpecialItem.SULFURAS, 0, Quality.SULFURAS),
+            Item(SpecialItem.SULFURAS, 0, Quality.SULFURAS),
         ),
         "Sulfuras 2": (
-            Item("Sulfuras, Hand of Ragnaros", -1, 80),
-            Item("Sulfuras, Hand of Ragnaros", -1, 80),
+            Item(SpecialItem.SULFURAS, -1, Quality.SULFURAS),
+            Item(SpecialItem.SULFURAS, -1, Quality.SULFURAS),
         ),
         "Backstage pass - new": (
-            Item("Backstage passes to a TAFKAL80ETC concert", 15, 20),
-            Item("Backstage passes to a TAFKAL80ETC concert", 14, 21),
+            Item(SpecialItem.BACKSTAGE_PASS, 15, 20),
+            Item(SpecialItem.BACKSTAGE_PASS, 14, 21),
         ),
         "Backstage pass - 10 days left": (
-            Item("Backstage passes to a TAFKAL80ETC concert", 10, 25),
-            Item("Backstage passes to a TAFKAL80ETC concert", 9, 27),
+            Item(SpecialItem.BACKSTAGE_PASS, 10, 25),
+            Item(SpecialItem.BACKSTAGE_PASS, 9, 27),
         ),
         "Backstage pass - 5 days left": (
-            Item("Backstage passes to a TAFKAL80ETC concert", 5, 35),
-            Item("Backstage passes to a TAFKAL80ETC concert", 4, 38),
+            Item(SpecialItem.BACKSTAGE_PASS, 5, 35),
+            Item(SpecialItem.BACKSTAGE_PASS, 4, 38),
         ),
         "Backstage pass - expiration": (
-            Item("Backstage passes to a TAFKAL80ETC concert", 0, 50),
-            Item("Backstage passes to a TAFKAL80ETC concert", -1, 0),
+            Item(SpecialItem.BACKSTAGE_PASS, 0, 50),
+            Item(SpecialItem.BACKSTAGE_PASS, -1, Quality.MIN),
         ),
         "Backstage pass - after expiration": (
-            Item("Backstage passes to a TAFKAL80ETC concert", -1, 0),
-            Item("Backstage passes to a TAFKAL80ETC concert", -2, 0),
+            Item(SpecialItem.BACKSTAGE_PASS, -1, Quality.MIN),
+            Item(SpecialItem.BACKSTAGE_PASS, -2, Quality.MIN),
         ),
         "Backstage pass - 10 days left, max value": (
-            Item("Backstage passes to a TAFKAL80ETC concert", 10, 49),
-            Item("Backstage passes to a TAFKAL80ETC concert", 9, 50),
+            Item(SpecialItem.BACKSTAGE_PASS, 10, 49),
+            Item(SpecialItem.BACKSTAGE_PASS, 9, Quality.MAX),
         ),
         "Backstage pass - 5 days left, max value": (
-            Item("Backstage passes to a TAFKAL80ETC concert", 5, 48),
-            Item("Backstage passes to a TAFKAL80ETC concert", 4, 50),
+            Item(SpecialItem.BACKSTAGE_PASS, 5, 48),
+            Item(SpecialItem.BACKSTAGE_PASS, 4, Quality.MAX),
         ),
     }
     for key, value in variants.items():
@@ -108,15 +118,15 @@ def invalid_items() -> Iterator[ParameterSet]:
             ItemQualityError,
         ),
         "Sulfuras - wrong value 1": (
-            Item("Sulfuras, Hand of Ragnaros", 0, 51),
+            Item(SpecialItem.SULFURAS, 0, 51),
             SulfurasQualityError,
         ),
         "Sulfuras - wrong value 2": (
-            Item("Sulfuras, Hand of Ragnaros", 0, -1),
+            Item(SpecialItem.SULFURAS, 0, -1),
             SulfurasQualityError,
         ),
         "Sulfuras - wrong value 3": (
-            Item("Sulfuras, Hand of Ragnaros", 0, 10),
+            Item(SpecialItem.SULFURAS, 0, 10),
             SulfurasQualityError,
         ),
     }
