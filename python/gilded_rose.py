@@ -69,35 +69,30 @@ class GildedRose:
             self.update_item(item)
 
     @staticmethod
-    def update_item(item) -> None:
+    def update_item(item: Item) -> None:
         """Update an item."""
-        if (
-            item.name != "Aged Brie"
-            and item.name != "Backstage passes to a TAFKAL80ETC concert"
-        ):
-            if item.quality > 0:
-                if item.name != "Sulfuras, Hand of Ragnaros":
-                    item.quality = item.quality - 1
-        else:
-            if item.quality < 50:
-                item.quality = item.quality + 1
-                if item.name == "Backstage passes to a TAFKAL80ETC concert":
-                    if item.sell_in < 11:
-                        if item.quality < 50:
-                            item.quality = item.quality + 1
-                    if item.sell_in < 6:
-                        if item.quality < 50:
-                            item.quality = item.quality + 1
-        if item.name != "Sulfuras, Hand of Ragnaros":
-            item.sell_in = item.sell_in - 1
-        if item.sell_in < 0:
-            if item.name != "Aged Brie":
-                if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                    if item.quality > 0:
-                        if item.name != "Sulfuras, Hand of Ragnaros":
-                            item.quality = item.quality - 1
+        if item.name == SpecialItem.SULFURAS:
+            return
+        if item.name == SpecialItem.BRIE:
+            item.quality = min(
+                item.quality + (1 if item.sell_in > 0 else 2), Quality.MAX
+            )
+        elif item.name == SpecialItem.BACKSTAGE_PASS:
+            if item.sell_in <= 0:
+                item.quality = Quality.MIN
+            elif item.quality < Quality.MAX:
+                if item.sell_in <= 5:
+                    item.quality += 3
+                elif item.sell_in <= 10:
+                    item.quality += 2
                 else:
-                    item.quality = item.quality - item.quality
-            else:
-                if item.quality < 50:
-                    item.quality = item.quality + 1
+                    item.quality += 1
+                item.quality = min(item.quality, Quality.MAX)
+        else:
+            if item.quality > Quality.MIN:
+                item.quality = max(
+                    item.quality - (1 if item.sell_in > 0 else 2), Quality.MIN
+                )
+
+        item.sell_in -= 1
+        return
