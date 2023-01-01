@@ -153,7 +153,7 @@ def invalid_items() -> Iterator[ParameterSet]:
 
 @pytest.mark.parametrize("item", invalid_items())
 def test_invalid_item(item) -> None:
-    """Test a single item after 1 day has passed."""
+    """Test that a single invalid item raises the appropriate exception."""
     expected_exception = item[1]
     with pytest.raises(expected_exception):
         GildedRose(items=[item[0]])
