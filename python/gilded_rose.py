@@ -63,6 +63,55 @@ def is_valid_item(item: Item) -> bool:
     return True
 
 
+class ItemDecay:
+    """Group the various methods to compute item decay."""
+
+    @staticmethod
+    def generic_item(item: Item) -> None:
+        """Decay of a generic item."""
+        if item.quality > Quality.MIN:
+            item.quality = max(
+                item.quality - (1 if item.sell_in > 0 else 2), Quality.MIN
+            )
+        item.sell_in -= 1
+
+    @staticmethod
+    def aged_brie(item: Item) -> None:
+        """Decay of Aged Brie."""
+        if item.quality < Quality.MAX:
+            item.quality = min(
+                item.quality + (1 if item.sell_in > 0 else 2), Quality.MAX
+            )
+        item.sell_in -= 1
+
+    @staticmethod
+    def sulfuras(item: Item) -> None:
+        """Decay of Sulfuras, Hand of Ragnaros."""
+
+    @staticmethod
+    def backstage_pass(item: Item) -> None:
+        """Decay of a backstage pass."""
+        if item.sell_in <= 0:
+            item.quality = Quality.MIN
+        elif item.quality < Quality.MAX:
+            if item.sell_in <= 5:
+                item.quality = min(item.quality + 3, Quality.MAX)
+            elif item.sell_in <= 10:
+                item.quality = min(item.quality + 2, Quality.MAX)
+            else:
+                item.quality = min(item.quality + 1, Quality.MAX)
+        item.sell_in -= 1
+
+    @staticmethod
+    def conjured_item(item: Item) -> None:
+        """Decay of a conjured item."""
+        if item.quality > Quality.MIN:
+            item.quality = max(
+                item.quality - (2 if item.sell_in > 0 else 4), Quality.MIN
+            )
+        item.sell_in -= 1
+
+
 class GildedRose:
     """Handle the Gilded Rose inventory."""
 
@@ -80,31 +129,12 @@ class GildedRose:
     def update_item(item: Item) -> None:
         """Update an item after a day has passed."""
         if item.name == SpecialItem.SULFURAS:
-            return
-        if item.name == SpecialItem.BRIE:
-            item.quality = min(
-                item.quality + (1 if item.sell_in > 0 else 2), Quality.MAX
-            )
+            ItemDecay.sulfuras(item)
+        elif item.name == SpecialItem.BRIE:
+            ItemDecay.aged_brie(item)
         elif item.name == SpecialItem.BACKSTAGE_PASS:
-            if item.sell_in <= 0:
-                item.quality = Quality.MIN
-            elif item.quality < Quality.MAX:
-                if item.sell_in <= 5:
-                    item.quality += 3
-                elif item.sell_in <= 10:
-                    item.quality += 2
-                else:
-                    item.quality += 1
-                item.quality = min(item.quality, Quality.MAX)
+            ItemDecay.backstage_pass(item)
         elif item.name.startswith(SpecialItem.CONJURED):
-            if item.quality > Quality.MIN:
-                item.quality = max(
-                    item.quality - (2 if item.sell_in > 0 else 4), Quality.MIN
-                )
+            ItemDecay.conjured_item(item)
         else:
-            if item.quality > Quality.MIN:
-                item.quality = max(
-                    item.quality - (1 if item.sell_in > 0 else 2), Quality.MIN
-                )
-
-        item.sell_in -= 1
+            ItemDecay.generic_item(item)
